@@ -16,11 +16,10 @@ import jackteng.util.*;
  */
 public class PATTermExtraction implements java.io.Serializable {
 
-    public final static int SCP = 0;         // Symmetric Conditional Probability.
-    public final static int SCPCD = 1;         // SCP with Context Dependency.
-    public final static int GMSCP = 2;         // Geometric Mean of SCP.
-    public final static int GMSCPCD = 3;         // Geometric Mean of SCP with Context
-    // Dependency.
+    public final static int SCP = 0;        // Symmetric Conditional Probability.
+    public final static int SCPCD = 1;      // SCP with Context Dependency.
+    public final static int GMSCP = 2;      // Geometric Mean of SCP.
+    public final static int GMSCPCD = 3;    // Geometric Mean of SCP with Context Dependency.
     public final static int CD = 4;         // Context independency ratio.
 
     private int langType = Strings.ChineseLike;
@@ -55,12 +54,20 @@ public class PATTermExtraction implements java.io.Serializable {
     public void addFile(String fileName) {
 	LineNumberReader lnr = null;
 	try {
-	    lnr = new LineNumberReader(new FileReader(fileName));
+	//--------------------------------------------------
+	//     lnr = new LineNumberReader(new FileReader(fileName));
+	//-------------------------------------------------- 
+	    lnr = new LineNumberReader(new InputStreamReader(new FileInputStream(fileName), "big5"));
 	    for (String str = lnr.readLine(); str != null; str = lnr.readLine()) {
 		StringBuffer sb = new StringBuffer();
 		str = Strings.condenseSpace(str);
+
 		for (String temp = str; temp.length() > 0; temp = temp.substring(1)) {
 		    String word = temp.substring(0, 1);
+		//--------------------------------------------------
+		//     System.err.println(word + " " + word.length());
+		//-------------------------------------------------- 
+
 		    boolean isLegal = ((langType == Strings.ChineseLike) ?
 				       NGram.isChineseWord(word) :
 				       (NGram.isEnglishAlphabet(word)
@@ -76,6 +83,7 @@ public class PATTermExtraction implements java.io.Serializable {
 			sb = new StringBuffer();
 		    }
 		}
+
 		if (sb.length() > 0) {
 		    String term = sb.toString().trim();
 		    pattree.insert(term);
@@ -321,7 +329,7 @@ public class PATTermExtraction implements java.io.Serializable {
 	    fh = new FileHandler[maxN];
 	    for (int j = 0; j < maxN; j++) {
 		fh[j] = new FileHandler(fileName + "_" + (j + 1) + "-gram.txt");
-		if (fh[j].exists()) { fh[j].delete(); }
+		if (fh[j].exists()) fh[j].delete();
 	    }
 	}
 
@@ -334,9 +342,10 @@ public class PATTermExtraction implements java.io.Serializable {
 	Map<String, Integer>[] result = (HashMap<String, Integer>[]) 
 	    java.lang.reflect.Array.newInstance(new HashMap<String, Integer>().getClass(), maxN);
 
+	for (int j = 0; j < maxN; ++j) result[j] = new HashMap<String, Integer>();
+
 	String word = "";
 	for (int i = 2; i <= maxN; i++) {
-	    System.err.println("i = " + i);
 	    ArrayList sps = pattree.getSuffixPerplexity(word, i);
 	    for (int j = (sps.size() - 1); j >= 0; j--) {
 		SuffixPerplexity sp = (SuffixPerplexity) sps.get(j);
@@ -359,7 +368,6 @@ public class PATTermExtraction implements java.io.Serializable {
 			((lratio <= freqRatio) || (lratio == 0))) {
 			result[i - 1].put(ngram, new Integer(sp.freq));
 			if (fh != null) {
-			    System.err.println(ngram + " " + sp.freq);
 			    fh[i - 1].println(ngram + " " + sp.freq, true);
 			}
 		    }
@@ -412,7 +420,6 @@ public class PATTermExtraction implements java.io.Serializable {
 
 	String word = "";
 	for (int i = 2; i <= maxN; i++) {
-	    System.err.println("i = " + i);
 	    ArrayList sps = pattree.getSuffixPerplexity(word, i);
 	    for (int j = (sps.size() - 1); j >= 0; j--) {
 		SuffixPerplexity sp = (SuffixPerplexity) sps.get(j);
@@ -451,7 +458,6 @@ public class PATTermExtraction implements java.io.Serializable {
 		    if (isMWU) {
 			result[i - 1].put(ngram, new Integer(sp.freq));
 			if (fh != null) {
-			    System.err.println(ngram + " " + sp.freq);
 			    fh[i - 1].println(ngram + " " + sp.freq, true);
 			}
 		    }

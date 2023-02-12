@@ -11,7 +11,7 @@ SRC = $(shell find src -name '*.java')
 
 JFLAGS = -Xlint:unchecked -cp $(CLASSPATH)
 BUILD = build
-BUNDLE = pattree-java.jar
+BUNDLE = pattree-java-0.1.jar
 
 #--------------------------------------------------
 # Rules

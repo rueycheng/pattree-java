@@ -25,17 +25,19 @@ public class NGram {
 
 	try {
 	    b = word.getBytes("big5");
-	} catch (UnsupportedEncodingException uee) {
-	    uee.printStackTrace();
-	}
+	} 
+	catch (UnsupportedEncodingException e) { e.printStackTrace(); }
+
 	if ( (b == null) || (b.length != 2)) {
 	    result = false;
 	} else {
 	    int hi = (int) ( (b[0] + 256) % 256);
 	    int lo = (int) ( (b[1] + 256) % 256);
 
-	    //System.out.println("hi=" + hi);
-	    //System.out.println("lo=" + lo);
+	//--------------------------------------------------
+	//     System.out.println("hi=" + hi);
+	//     System.out.println("lo=" + lo);
+	//-------------------------------------------------- 
 
 	    if (hi < 0xA4) {
 		result = false;
