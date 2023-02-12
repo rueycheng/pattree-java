@@ -12,6 +12,9 @@ public class TermExtractor {
 	    OptionBuilder.withLongOpt("help")
 		.withDescription("Show this help screen")
 		.create(),
+	    OptionBuilder.withLongOpt("input")
+		.withDescription("Path to the input (corpus) directory")
+		.hasArg().withArgName("dir").create(),
 	    OptionBuilder.withLongOpt("output")
 		.withDescription("Path to the output directory")
 		.hasArg().withArgName("dir").create(),
@@ -52,10 +55,17 @@ public class TermExtractor {
 	//--------------------------------------------------
 	// Now set up options
 	//-------------------------------------------------- 
+	String inputPath = line.getOptionValue("input");
 	String outputPath = line.getOptionValue("output");
 	int minFreq = Integer.parseInt(line.getOptionValue("min-freq", "2"));
 	int maxN = Integer.parseInt(line.getOptionValue("max-n", "12"));
 	int windowSize = Integer.parseInt(line.getOptionValue("window-size", "1"));
+	int langType = Strings.ChineseLike; // Dirty
+
+	if (inputPath == null) {
+	    System.err.println("The argument '--input' is required");
+	    System.exit(1);
+	}
 
 	if (outputPath == null) {
 	    System.err.println("The argument '--output' is required");
@@ -75,18 +85,27 @@ public class TermExtractor {
 	//-------------------------------------------------- 
 	PATTermExtraction te = null;
 
+	File inputDir = new File(inputPath);
+	if (!inputDir.isDirectory()) {
+	    System.err.println(inputDir.getAbsolutePath() + " is not a directory");
+	    System.exit(1);
+	}
+
 	File outputDir = new File(outputPath);
 	if (!outputDir.exists()) outputDir.mkdirs();
 
 	FileHandler treeFile = new FileHandler(outputDir, "tree");
 
-	if (treeFile.exists())
-	    te = (PATTermExtraction)treeFile.readObject();
-	else {
-	    try {
-		te = new PATTermExtraction(outputDir.getAbsolutePath(), Strings.ChineseLike);
+	try {
+	    if (treeFile.exists())
+		te = (PATTermExtraction)treeFile.readObject();
+	    else {
+		te = new PATTermExtraction(inputDir.getAbsolutePath(), langType);
+		te.toFile(treeFile.getAbsolutePath());
 	    }
-	    catch (Exception e) { e.printStackTrace(); }
+
+	    te.extract(associationMeasure, minFreq, maxN, windowSize, outputPath);
 	}
+	catch (Exception e) { e.printStackTrace(); }
     }
 }
