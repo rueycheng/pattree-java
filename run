@@ -1,0 +1,4 @@
+#!/bin/bash
+
+classpath="`ls -1U pattree-java-*.jar lib/*.jar | paste -s -d':'`"
+/usr/bin/java -cp "$classpath" TermExtractor "$@"
