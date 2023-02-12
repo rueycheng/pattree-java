@@ -6,7 +6,7 @@ JAR = /usr/bin/jar
 PERL = /usr/bin/perl
 CTAGS = /usr/bin/ctags
 
-CLASSPATH = $(shell find lib -name '*.jar' 2>/dev/null | $(PERL) -e'print join(":", "src", map { chomp; $$_ } <>), "\n"')
+CLASSPATH = $(shell ls -1Ud src lib/*.jar 2>/dev/null | paste -s -d':')
 SRC = $(shell find src -name '*.java')
 
 JFLAGS = -Xlint:unchecked -cp $(CLASSPATH)
