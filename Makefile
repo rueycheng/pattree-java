@@ -28,8 +28,7 @@ all: jar
 jar: $(BUNDLE)
 
 $(BUNDLE): $(SRC:.java=.class)
-	(cd src; $(JAR) cvfM $(BUNDLE) $(shell cd src; find -name '*.class' | $(PERL) -lne"print qq('\$$_')"))
-	mv src/$(BUNDLE) .
+	(cd src; find -name '*.class' -print0 | xargs -0 $(JAR) cvM) > $@
 
 #--------------------------------------------------
 # Tags support are optional
@@ -38,4 +37,4 @@ tags:
 	$(CTAGS) -R src
 
 clean:
-	find src -name '*.class' | $(PERL) -lne"print qq('\$$_')" | xargs rm -f
+	find src -name '*.class' -delete 
